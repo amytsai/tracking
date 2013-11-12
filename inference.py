@@ -485,7 +485,6 @@ class JointParticleFilter:
         noisyDistances = gameState.getNoisyGhostDistances()
         if len(noisyDistances) < self.numGhosts: return
         emissionModels = [busters.getObservationDistribution(dist) for dist in noisyDistances]
-        print "emissionModels", emissionModels
 
 
         newParticles = []
@@ -579,6 +578,10 @@ class JointParticleFilter:
             # now loop through and update each entry in newParticle...
 
             "*** YOUR CODE HERE ***"
+
+            for i in range(self.numGhosts):
+                newPosDist = getPositionDistributionForGhost(setGhostPositions(gameState, list(oldParticle)), i, self.ghostAgents[i])
+                newParticle[i] = util.sample(newPosDist)
 
             "*** END YOUR CODE HERE ***"
             newParticles.append(tuple(newParticle))
