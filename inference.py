@@ -485,6 +485,7 @@ class JointParticleFilter:
         noisyDistances = gameState.getNoisyGhostDistances()
         if len(noisyDistances) < self.numGhosts: return
         emissionModels = [busters.getObservationDistribution(dist) for dist in noisyDistances]
+        print "emissionModels", emissionModels
 
 
         newParticles = []
@@ -492,19 +493,19 @@ class JointParticleFilter:
 
         for i in range(self.numGhosts):
             if noisyDistances[i] is None:
-                for p in self.particles:
-                    self.getParticleWithGhostInJail(p, i)
+                self.particles = [self.getParticleWithGhostInJail(p, i) for p in self.particles]
+                #print "particles" , self.particles[0:20]
 
         for p in self.particles:
             tempWeight = 1.0
             for i in range(self.numGhosts):
-                if p[i] != self.getJailPosition:
+                if p[i] != self.getJailPosition(i):
                     trueDistance = util.manhattanDistance(p[i], pacmanPosition)
                     tempWeight *= emissionModels[i][trueDistance]
+            #print "tempWeight", tempWeight
             weightedParticles[p] += tempWeight
 
         weightedParticles.normalize()
-        print weightedParticles
 
         if weightedParticles.totalCount() == 0:
             self.initializeParticles()
@@ -516,7 +517,9 @@ class JointParticleFilter:
         else:
             for i in range(0, self.numParticles):
                 newParticles.append(util.sample(weightedParticles))
+
             self.particles = newParticles
+            #print "particles updated" , self.particles[0:20]
 
 
         
